@@ -7,7 +7,16 @@ const CATEGORIES = [
   'UA & Marketing', 'UI & UX Design', 'Writing',
 ]
 
-const SENIORITIES = ['junior', 'mid', 'senior', 'lead', 'director']
+// All normalised seniority values (after backend normalisation)
+const SENIORITIES = [
+  { value: 'trainee', label: 'Trainee' },
+  { value: 'junior',  label: 'Junior'  },
+  { value: 'mid',     label: 'Mid'     },
+  { value: 'senior',  label: 'Senior'  },
+  { value: 'lead',    label: 'Lead'    },
+  { value: 'manager', label: 'Manager' },
+  { value: 'director',label: 'Director'},
+]
 
 const STATUSES = [
   'Applied-to-event',
@@ -17,11 +26,20 @@ const STATUSES = [
   'Placed',
 ]
 
+function CzpBadge() {
+  return (
+    <span className="ml-1.5 text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-50 text-blue-500 uppercase tracking-wide">
+      CZP
+    </span>
+  )
+}
+
 export default function FilterPanel({ filters, onChange }) {
   const set = (key, val) => onChange({ ...filters, [key]: val || undefined })
   const clear = () => onChange({})
 
   const activeCount = Object.values(filters).filter(Boolean).length
+  const czpMode = filters.source === 'czp'
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-4">
@@ -34,9 +52,40 @@ export default function FilterPanel({ filters, onChange }) {
         )}
       </div>
 
-      {/* Category */}
+      {/* Source toggle */}
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1.5">Category</label>
+        <label className="block text-xs font-medium text-gray-500 mb-1.5">Candidate source</label>
+        <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs font-medium">
+          {[
+            { value: '',    label: 'All' },
+            { value: 'czp', label: 'Careers Zone' },
+            { value: 'job', label: 'Job Board' },
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => set('source', opt.value)}
+              className={`flex-1 py-1.5 transition-colors ${
+                (filters.source || '') === opt.value
+                  ? 'bg-brand-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        {!czpMode && (filters.category || filters.seniority) && (
+          <p className="text-[11px] text-amber-600 mt-1.5 leading-snug">
+            Category &amp; Seniority filters only match Careers Zone candidates — job board applicants don't have these fields.
+          </p>
+        )}
+      </div>
+
+      {/* Category — CZP field */}
+      <div>
+        <label className="block text-xs font-medium text-gray-500 mb-1.5">
+          Category <CzpBadge />
+        </label>
         <select
           value={filters.category || ''}
           onChange={e => set('category', e.target.value)}
@@ -47,21 +96,23 @@ export default function FilterPanel({ filters, onChange }) {
         </select>
       </div>
 
-      {/* Seniority */}
+      {/* Seniority — CZP field */}
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1.5">Seniority</label>
+        <label className="block text-xs font-medium text-gray-500 mb-1.5">
+          Seniority <CzpBadge />
+        </label>
         <div className="flex flex-wrap gap-1.5">
-          {SENIORITIES.map(s => (
+          {SENIORITIES.map(({ value, label }) => (
             <button
-              key={s}
-              onClick={() => set('seniority', filters.seniority === s ? '' : s)}
-              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${
-                filters.seniority === s
+              key={value}
+              onClick={() => set('seniority', filters.seniority === value ? '' : value)}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                filters.seniority === value
                   ? 'bg-brand-600 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              {s}
+              {label}
             </button>
           ))}
         </div>

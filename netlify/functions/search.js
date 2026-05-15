@@ -46,12 +46,40 @@ async function getZohoToken() {
 
 // ─── Criteria builders ───────────────────────────────────────────────────────
 
+// Reverse-map normalised seniority → all raw Zoho values that could be stored
+const SENIORITY_ZOHO_RAW = {
+  trainee:  ['student/trainee', 'trainee', 'student', 'intern'],
+  junior:   ['junior'],
+  mid:      ['mid', 'middle', 'intermediate'],
+  senior:   ['senior'],
+  lead:     ['lead', 'principal', 'staff'],
+  manager:  ['manager'],
+  director: ['director', 'head', 'vp'],
+};
+
 function filterCriteria(filters = {}) {
   const parts = [];
-  if (filters.category) parts.push(`(Pick_List_5:equals:${filters.category})`);
-  if (filters.seniority) parts.push(`(Single_Line_1:equals:${filters.seniority})`);
-  if (filters.status)   parts.push(`(Candidate_Status:equals:${filters.status})`);
-  if (filters.country)  parts.push(`(Country:equals:${filters.country})`);
+
+  // source === 'job': skip CZP-only fields (they're empty for job board applicants)
+  const skipCzpFields = filters.source === 'job';
+
+  if (filters.category && !skipCzpFields) {
+    parts.push(`(Pick_List_5:equals:${filters.category})`);
+  }
+
+  if (filters.seniority && !skipCzpFields) {
+    // Zoho stores raw values like "middle", "student/trainee" — build OR for all variants
+    const rawValues = SENIORITY_ZOHO_RAW[filters.seniority] || [filters.seniority];
+    if (rawValues.length === 1) {
+      parts.push(`(Single_Line_1:equals:${rawValues[0]})`);
+    } else {
+      parts.push(`(${rawValues.map(v => `(Single_Line_1:equals:${v})`).join('OR')})`);
+    }
+  }
+
+  if (filters.status) parts.push(`(Candidate_Status:equals:${filters.status})`);
+  if (filters.country) parts.push(`(Country:equals:${filters.country})`);
+
   return parts;
 }
 
