@@ -78,6 +78,7 @@ function filterCriteria(filters = {}) {
     }
   }
 
+  if (filters.interviewed) parts.push(`(Screening_notes:starts_with:Candidate)`);
   if (filters.status) parts.push(`(Candidate_Status:equals:${filters.status})`);
   if (filters.country) parts.push(`(Country:equals:${filters.country})`);
 

@@ -52,6 +52,19 @@ export default function FilterPanel({ filters, onChange }) {
         )}
       </div>
 
+      {/* Interviewed quick filter */}
+      <button
+        onClick={() => set('interviewed', filters.interviewed ? '' : 'true')}
+        className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+          filters.interviewed
+            ? 'bg-emerald-500 border-emerald-500 text-white'
+            : 'bg-white border-gray-200 text-gray-600 hover:border-emerald-300 hover:text-emerald-700'
+        }`}
+      >
+        <span className={`w-2 h-2 rounded-full ${filters.interviewed ? 'bg-white' : 'bg-emerald-400'}`} />
+        Interviewed candidates
+      </button>
+
       {/* Source toggle */}
       <div>
         <label className="block text-xs font-medium text-gray-500 mb-1.5">Candidate source</label>
