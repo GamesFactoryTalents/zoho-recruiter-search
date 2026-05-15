@@ -57,16 +57,26 @@ function filterCriteria(filters = {}) {
 function buildSimpleCriteria(query, filters) {
   const parts = [...filterCriteria(filters)];
   if (query && query.trim()) {
-    const q = query.trim();
-    parts.push(
-      `((Full_Name:contains:${q})OR(SKILLS:contains:${q})OR(Specialities_2:contains:${q}))`
-    );
+    const words = query.trim().split(/\s+/).filter(w => w.length > 1);
+    if (words.length <= 1) {
+      const q = query.trim();
+      parts.push(`((Full_Name:contains:${q})OR(SKILLS:contains:${q})OR(Specialities_2:contains:${q}))`);
+    } else {
+      // Multi-word: any word match across searchable fields (OR = broad results for simple mode)
+      const wordCriteria = words.map(w =>
+        `((Full_Name:contains:${w})OR(SKILLS:contains:${w})OR(Specialities_2:contains:${w}))`
+      );
+      parts.push(`(${wordCriteria.join('OR')})`);
+    }
   }
   return parts.length ? parts.join('AND') : null;
 }
 
 function buildBooleanCriteria(query, filters) {
   if (!query || !query.trim()) return buildSimpleCriteria('', filters);
+
+  // If no boolean operators present, fall back to simple multi-word search
+  if (!/\s+(AND|OR|NOT)\s+/i.test(query)) return buildSimpleCriteria(query, filters);
 
   // Split gives alternating [term, op, term, op, term...] because of capturing group
   const raw    = query.trim();
@@ -95,7 +105,7 @@ async function buildAICriteria(query, filters) {
   const resp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
-      'x-api-key':         process.env.ANTHROPIC_API_KEY,
+      'x-api-key':         process.env.CZP_ANTHROPIC_API_KEY,
       'anthropic-version': '2023-06-01',
       'content-type':      'application/json',
     },
@@ -105,17 +115,24 @@ async function buildAICriteria(query, filters) {
       system: `You convert natural-language recruitment queries into Zoho Recruit API criteria strings.
 
 Zoho criteria format: (field:operator:value)AND(field:operator:value)
+Use OR to broaden searches, AND only when both conditions are essential.
 Operators: equals, contains, starts_with
 
 Available fields and exact values:
 - Full_Name: candidate name
-- SKILLS: any skill name (Unity, Python, Unreal Engine, etc.)
+- SKILLS: any skill name (Unity, Python, Unreal Engine, Analytics, SQL, etc.)
 - Specialities_2: specialisation tags
 - Pick_List_5 (category): "Art & Animation" | "Audio & Sound" | "Business & Management" | "Data & Analytics" | "Game Design" | "Localisation" | "Monetisation" | "Player Support & Community" | "Product & LiveOps" | "Production" | "Programming & Engineering" | "QA & Testing" | "UA & Marketing" | "UI & UX Design" | "Writing"
 - Single_Line_1 (seniority): junior | mid | senior | lead | director
 - Country: country name (e.g. Finland, United Kingdom)
 - City: city name
 - Candidate_Status: any status string
+
+Rules:
+- For role-based queries (e.g. "marketing data analyst"), map to 1-2 categories with OR, NOT AND
+- Avoid combining category AND skill unless the skill is highly specific to that role
+- Prefer broader OR criteria over narrow AND criteria — returning some results is better than none
+- When a query maps to multiple possible categories, use OR between them
 
 Return JSON only — no markdown:
 {"criteria": "<criteria string or null>", "explanation": "<one sentence what you searched for>"}`,
