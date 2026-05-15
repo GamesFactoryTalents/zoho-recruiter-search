@@ -15,6 +15,7 @@ const CANDIDATE_FIELDS = [
   'Engines_2',
   'Platforms_2',
   'Genres_2',
+  'Skill_Set',
   'Expected_Salary',
   'Work_Preferences',
   'Relocation',
@@ -60,11 +61,11 @@ function buildSimpleCriteria(query, filters) {
     const words = query.trim().split(/\s+/).filter(w => w.length > 1);
     if (words.length <= 1) {
       const q = query.trim();
-      parts.push(`((Full_Name:contains:${q})OR(SKILLS:contains:${q})OR(Specialities_2:contains:${q}))`);
+      parts.push(`((Full_Name:contains:${q})OR(SKILLS:contains:${q})OR(Skill_Set:contains:${q})OR(Specialities_2:contains:${q}))`);
     } else {
       // Multi-word: any word match across searchable fields (OR = broad results for simple mode)
       const wordCriteria = words.map(w =>
-        `((Full_Name:contains:${w})OR(SKILLS:contains:${w})OR(Specialities_2:contains:${w}))`
+        `((Full_Name:contains:${w})OR(SKILLS:contains:${w})OR(Skill_Set:contains:${w})OR(Specialities_2:contains:${w}))`
       );
       parts.push(`(${wordCriteria.join('OR')})`);
     }
@@ -86,7 +87,7 @@ function buildBooleanCriteria(query, filters) {
 
   const termCriteria = (term) => {
     const t = term.replace(/[()]/g, '').trim();
-    return `((SKILLS:contains:${t})OR(Specialities_2:contains:${t})OR(Full_Name:contains:${t}))`;
+    return `((SKILLS:contains:${t})OR(Skill_Set:contains:${t})OR(Specialities_2:contains:${t})OR(Full_Name:contains:${t}))`;
   };
 
   let criteriaStr = termCriteria(terms[0]);
@@ -178,6 +179,7 @@ function formatCandidate(c) {
     country:        pick(c.Country),
     city:           c.City || '',
     skills:         pickList(c.SKILLS),
+    skillSet:       pickList(c.Skill_Set),
     specialities:   pickList(c.Specialities_2),
     status:         c.Candidate_Status || '',
     currentTitle:   c.Current_Job_Title || '',

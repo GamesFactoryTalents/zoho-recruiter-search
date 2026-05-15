@@ -138,7 +138,16 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
                 )}
               </Section>
 
-              {/* Skills */}
+              {/* Specialities */}
+              {c.specialities?.length > 0 && (
+                <Section title="Specialities">
+                  <div className="flex flex-wrap gap-1.5">
+                    {c.specialities.map(s => <Tag key={s} color="purple">{s}</Tag>)}
+                  </div>
+                </Section>
+              )}
+
+              {/* Skills (recruiter-tagged) */}
               {c.skills?.length > 0 && (
                 <Section title="Skills">
                   <div className="flex flex-wrap gap-1.5">
@@ -147,11 +156,11 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
                 </Section>
               )}
 
-              {/* Specialities */}
-              {c.specialities?.length > 0 && (
-                <Section title="Specialities">
+              {/* Skill Set (from CV / LinkedIn import) */}
+              {c.skillSet?.length > 0 && (
+                <Section title="Skill Set (CV)">
                   <div className="flex flex-wrap gap-1.5">
-                    {c.specialities.map(s => <Tag key={s} color="purple">{s}</Tag>)}
+                    {c.skillSet.map(s => <Tag key={s} color="gray">{s}</Tag>)}
                   </div>
                 </Section>
               )}

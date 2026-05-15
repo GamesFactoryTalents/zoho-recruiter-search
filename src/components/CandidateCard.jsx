@@ -21,8 +21,13 @@ export default function CandidateCard({ candidate, onClick }) {
   const seniorityClass = SENIORITY_COLORS[candidate.seniority?.toLowerCase()] || 'bg-gray-100 text-gray-600'
 
   const location = [candidate.city, candidate.country].filter(Boolean).join(', ')
-  const topSkills = candidate.skills.slice(0, 5)
-  const moreSkills = candidate.skills.length - 5
+
+  // Prefer SKILLS (recruiter-tagged); fall back to Skill_Set if empty
+  const primarySkills = candidate.skills?.length > 0 ? candidate.skills : (candidate.skillSet || [])
+  const topSkills  = primarySkills.slice(0, 5)
+  const moreSkills = primarySkills.length - 5
+
+  const topSpecialities = (candidate.specialities || []).slice(0, 3)
 
   return (
     <div
@@ -79,7 +84,7 @@ export default function CandidateCard({ candidate, onClick }) {
 
       {/* Skills */}
       {topSkills.length > 0 && (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 mb-1.5">
           {topSkills.map(s => (
             <span key={s} className="text-xs px-2 py-0.5 bg-brand-50 text-brand-700 rounded-md">
               {s}
@@ -88,6 +93,17 @@ export default function CandidateCard({ candidate, onClick }) {
           {moreSkills > 0 && (
             <span className="text-xs px-2 py-0.5 text-gray-400">+{moreSkills} more</span>
           )}
+        </div>
+      )}
+
+      {/* Specialities */}
+      {topSpecialities.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {topSpecialities.map(s => (
+            <span key={s} className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 rounded-md">
+              {s}
+            </span>
+          ))}
         </div>
       )}
     </div>

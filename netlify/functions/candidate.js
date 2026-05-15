@@ -67,6 +67,7 @@ export const handler = async (event) => {
       country:          pick(c.Country),
       city:             c.City || '',
       skills:           pickList(c.SKILLS),
+      skillSet:         pickList(c.Skill_Set),
       specialities:     pickList(c.Specialities_2),
       status:           c.Candidate_Status || '',
       currentTitle:     c.Current_Job_Title || '',
