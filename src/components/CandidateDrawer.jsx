@@ -2,6 +2,16 @@ import { useEffect, useState } from 'react'
 import { X, ExternalLink, MapPin, Briefcase, Clock, DollarSign, Plane, Loader2 } from 'lucide-react'
 import { fetchCandidate } from '../lib/api'
 
+const SENIORITY_LABELS = {
+  trainee:  'Trainee / Student',
+  junior:   'Junior',
+  mid:      'Mid-level',
+  senior:   'Senior',
+  lead:     'Lead',
+  manager:  'Manager',
+  director: 'Director',
+}
+
 function Tag({ children, color = 'gray' }) {
   const colors = {
     gray:   'bg-gray-100 text-gray-700',
@@ -54,7 +64,9 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
         <div className="flex items-start justify-between p-5 border-b border-gray-100">
           <div>
             <h2 className="text-lg font-bold text-gray-900">{c.name}</h2>
-            {c.currentTitle && <p className="text-sm text-gray-500 mt-0.5">{c.currentTitle}</p>}
+            {(c.currentTitle || c.specialities?.[0]) && (
+              <p className="text-sm text-gray-500 mt-0.5">{c.currentTitle || c.specialities?.[0]}</p>
+            )}
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
             <X size={18} />
@@ -83,9 +95,9 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
                     </div>
                   )}
                   {c.seniority && (
-                    <div className="flex items-center gap-1.5 text-gray-600 capitalize">
+                    <div className="flex items-center gap-1.5 text-gray-600">
                       <span className="w-2 h-2 rounded-full bg-brand-500" />
-                      {c.seniority}
+                      {SENIORITY_LABELS[c.seniority] || c.seniority}
                     </div>
                   )}
                   {(c.city || c.country) && (

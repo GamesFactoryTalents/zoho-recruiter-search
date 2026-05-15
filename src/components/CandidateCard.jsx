@@ -9,10 +9,12 @@ const STATUS_COLORS = {
 }
 
 const SENIORITY_COLORS = {
+  trainee:  'bg-teal-50 text-teal-700',
   junior:   'bg-sky-50 text-sky-700',
   mid:      'bg-indigo-50 text-indigo-700',
   senior:   'bg-violet-50 text-violet-700',
   lead:     'bg-orange-50 text-orange-700',
+  manager:  'bg-amber-50 text-amber-700',
   director: 'bg-rose-50 text-rose-700',
 }
 
@@ -21,6 +23,9 @@ export default function CandidateCard({ candidate, onClick }) {
   const seniorityClass = SENIORITY_COLORS[candidate.seniority?.toLowerCase()] || 'bg-gray-100 text-gray-600'
 
   const location = [candidate.city, candidate.country].filter(Boolean).join(', ')
+
+  // Job title: use currentTitle if set, else first speciality as role descriptor
+  const jobTitle = candidate.currentTitle || candidate.specialities?.[0] || ''
 
   // Prefer SKILLS (recruiter-tagged); fall back to Skill_Set if empty
   const primarySkills = candidate.skills?.length > 0 ? candidate.skills : (candidate.skillSet || [])
@@ -40,8 +45,8 @@ export default function CandidateCard({ candidate, onClick }) {
           <h3 className="font-semibold text-gray-900 truncate group-hover:text-brand-600 transition-colors">
             {candidate.name}
           </h3>
-          {candidate.currentTitle && (
-            <p className="text-sm text-gray-500 truncate">{candidate.currentTitle}</p>
+          {jobTitle && (
+            <p className="text-sm text-gray-500 truncate">{jobTitle}</p>
           )}
         </div>
         <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full border ${statusClass}`}>

@@ -160,6 +160,22 @@ Return JSON only — no markdown:
 
 // ─── Candidate formatter ─────────────────────────────────────────────────────
 
+const SENIORITY_MAP = {
+  'student/trainee': 'trainee',
+  'middle':          'mid',
+  'junior':          'junior',
+  'mid':             'mid',
+  'senior':          'senior',
+  'lead':            'lead',
+  'manager':         'manager',
+  'director':        'director',
+};
+
+function normalizeSeniority(val) {
+  if (!val) return '';
+  return SENIORITY_MAP[val.toLowerCase()] || val.toLowerCase();
+}
+
 function pick(obj) {
   return (obj && typeof obj === 'object') ? (obj.name || '') : (obj || '');
 }
@@ -175,7 +191,7 @@ function formatCandidate(c) {
     id:             c.id,
     name:           c.Full_Name || `${c.First_Name || ''} ${c.Last_Name || ''}`.trim(),
     category:       pick(c.Pick_List_5),
-    seniority:      c.Single_Line_1 || pick(c.Seniority_Level_2) || '',
+    seniority:      normalizeSeniority(c.Single_Line_1 || pick(c.Seniority_Level_2)),
     country:        pick(c.Country),
     city:           c.City || '',
     skills:         pickList(c.SKILLS),
