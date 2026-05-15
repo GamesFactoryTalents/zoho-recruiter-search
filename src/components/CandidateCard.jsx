@@ -45,6 +45,11 @@ export default function CandidateCard({ candidate, onClick }) {
   const hasMeta   = location || candidate.experienceYears != null ||
                     (candidate.gamingYears != null && candidate.gamingYears > 0)
 
+  // Gaming stack — CZP only
+  const topEngines   = (candidate.engines   || []).slice(0, 3)
+  const topPlatforms = (candidate.platforms || []).slice(0, 4)
+  const hasGamingStack = topEngines.length > 0 || topPlatforms.length > 0
+
   return (
     <div
       onClick={onClick}
@@ -136,6 +141,22 @@ export default function CandidateCard({ candidate, onClick }) {
           {topSpecialities.map(s => (
             <span key={s} className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 rounded-md">
               {s}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Gaming stack — engines + platforms, CZP only */}
+      {hasGamingStack && (
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {topEngines.map(e => (
+            <span key={e} className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 rounded-md">
+              {e}
+            </span>
+          ))}
+          {topPlatforms.map(p => (
+            <span key={p} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md">
+              {p}
             </span>
           ))}
         </div>
