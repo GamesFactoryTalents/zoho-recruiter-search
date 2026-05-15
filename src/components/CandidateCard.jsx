@@ -1,4 +1,5 @@
-import { MapPin, Briefcase, Clock } from 'lucide-react'
+import { useState } from 'react'
+import { MapPin, Briefcase, Clock, ClipboardList, ChevronDown, ChevronUp } from 'lucide-react'
 
 const STATUS_COLORS = {
   'Applied-to-event':          'bg-blue-50 text-blue-700 border-blue-200',
@@ -19,6 +20,8 @@ const SENIORITY_COLORS = {
 }
 
 export default function CandidateCard({ candidate, onClick }) {
+  const [notesOpen, setNotesOpen] = useState(false)
+
   const statusClass    = STATUS_COLORS[candidate.status] || 'bg-gray-100 text-gray-500 border-gray-200'
   const seniorityClass = SENIORITY_COLORS[candidate.seniority?.toLowerCase()] || 'bg-gray-100 text-gray-600'
 
@@ -50,9 +53,16 @@ export default function CandidateCard({ candidate, onClick }) {
       {/* Header — always shown */}
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="min-w-0">
-          <h3 className="font-semibold text-gray-900 truncate group-hover:text-brand-600 transition-colors">
-            {candidate.name}
-          </h3>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <h3 className="font-semibold text-gray-900 truncate group-hover:text-brand-600 transition-colors">
+              {candidate.name}
+            </h3>
+            {candidate.screeningNotes && (
+              <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 uppercase tracking-wide">
+                <ClipboardList size={9} /> Interviewed
+              </span>
+            )}
+          </div>
           {jobTitle && (
             <p className="text-sm text-gray-500 truncate">{jobTitle}</p>
           )}
@@ -128,6 +138,28 @@ export default function CandidateCard({ candidate, onClick }) {
               {s}
             </span>
           ))}
+        </div>
+      )}
+
+      {/* Screening notes toggle */}
+      {candidate.screeningNotes && (
+        <div className="mt-3 border-t border-gray-100 pt-2.5">
+          <button
+            onClick={e => { e.stopPropagation(); setNotesOpen(v => !v) }}
+            className="flex items-center gap-1.5 text-xs font-medium text-emerald-700 hover:text-emerald-800 transition-colors"
+          >
+            <ClipboardList size={12} />
+            {notesOpen ? 'Hide' : 'Read'} screening notes
+            {notesOpen ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+          </button>
+          {notesOpen && (
+            <div
+              onClick={e => e.stopPropagation()}
+              className="mt-2 text-xs text-gray-700 leading-relaxed whitespace-pre-wrap bg-emerald-50 rounded-lg px-3 py-2.5 max-h-48 overflow-y-auto border border-emerald-100"
+            >
+              {candidate.screeningNotes}
+            </div>
+          )}
         </div>
       )}
     </div>

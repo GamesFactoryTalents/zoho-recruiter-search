@@ -169,6 +169,15 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
                 )}
               </Section>
 
+              {/* Screening Notes — shown prominently when present */}
+              {c.screeningNotes && (
+                <Section title="🟢 Screening Notes (Interviewed)">
+                  <div className="bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {c.screeningNotes}
+                  </div>
+                </Section>
+              )}
+
               {/* AI Summary */}
               <div className="mb-5">
                 {!summary && !sumLoading && (

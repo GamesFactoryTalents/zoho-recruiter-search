@@ -102,6 +102,7 @@ export const handler = async (event) => {
       tasks:            c.Tasks || '',
       achievements:     c.Achievements || '',
       dreamJob:         c.What_are_the_challenges_and_lessons_learned || '',
+      screeningNotes:   c.Screening_notes || '',
       createdAt:        c.Created_Time || '',
       resumeId:         resume?.id || null,
       resumeName:       resume?.File_Name || null,

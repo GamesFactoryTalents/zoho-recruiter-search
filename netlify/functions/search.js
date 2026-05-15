@@ -16,6 +16,7 @@ const CANDIDATE_FIELDS = [
   'Platforms_2',
   'Genres_2',
   'Skill_Set',
+  'Screening_notes',
   'Expected_Salary',
   'Work_Preferences',
   'Relocation',
@@ -89,11 +90,11 @@ function buildSimpleCriteria(query, filters) {
     const words = query.trim().split(/\s+/).filter(w => w.length > 1);
     if (words.length <= 1) {
       const q = query.trim();
-      parts.push(`((Full_Name:contains:${q})OR(SKILLS:contains:${q})OR(Skill_Set:contains:${q})OR(Specialities_2:contains:${q}))`);
+      parts.push(`((Full_Name:contains:${q})OR(SKILLS:contains:${q})OR(Skill_Set:contains:${q})OR(Specialities_2:contains:${q})OR(Screening_notes:contains:${q}))`);
     } else {
       // Multi-word: any word match across searchable fields (OR = broad results for simple mode)
       const wordCriteria = words.map(w =>
-        `((Full_Name:contains:${w})OR(SKILLS:contains:${w})OR(Skill_Set:contains:${w})OR(Specialities_2:contains:${w}))`
+        `((Full_Name:contains:${w})OR(SKILLS:contains:${w})OR(Skill_Set:contains:${w})OR(Specialities_2:contains:${w})OR(Screening_notes:contains:${w}))`
       );
       parts.push(`(${wordCriteria.join('OR')})`);
     }
@@ -115,7 +116,7 @@ function buildBooleanCriteria(query, filters) {
 
   const termCriteria = (term) => {
     const t = term.replace(/[()]/g, '').trim();
-    return `((SKILLS:contains:${t})OR(Skill_Set:contains:${t})OR(Specialities_2:contains:${t})OR(Full_Name:contains:${t}))`;
+    return `((SKILLS:contains:${t})OR(Skill_Set:contains:${t})OR(Specialities_2:contains:${t})OR(Full_Name:contains:${t})OR(Screening_notes:contains:${t}))`;
   };
 
   let criteriaStr = termCriteria(terms[0]);
@@ -234,8 +235,9 @@ function formatCandidate(c) {
     genres:         pickList(c.Genres_2),
     expectedSalary: c.Expected_Salary,
     relocation:     c.Relocation,
-    linkedin:       c.LinkedIn || c.LinkedIn__s || '',
-    createdAt:      c.Created_Time || '',
+    linkedin:        c.LinkedIn || c.LinkedIn__s || '',
+    screeningNotes:  c.Screening_notes || '',
+    createdAt:       c.Created_Time || '',
   };
 }
 
