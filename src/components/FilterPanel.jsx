@@ -7,7 +7,6 @@ const CATEGORIES = [
   'UA & Marketing', 'UI & UX Design', 'Writing',
 ]
 
-// All normalised seniority values (after backend normalisation)
 const SENIORITIES = [
   { value: 'trainee', label: 'Trainee' },
   { value: 'junior',  label: 'Junior'  },
@@ -17,15 +16,6 @@ const SENIORITIES = [
   { value: 'manager', label: 'Manager' },
   { value: 'director',label: 'Director'},
 ]
-
-const STATUSES = [
-  'Applied-to-event',
-  'Submitted-to-Talent-Board',
-  'Available',
-  'Not Available',
-  'Placed',
-]
-
 
 export default function FilterPanel({ filters, onChange }) {
   const set = (key, val) => onChange({ ...filters, [key]: val || undefined })
@@ -46,9 +36,7 @@ export default function FilterPanel({ filters, onChange }) {
 
       {/* Category */}
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1.5">
-          Category
-        </label>
+        <label className="block text-xs font-medium text-gray-500 mb-1.5">Category</label>
         <select
           value={filters.category || ''}
           onChange={e => set('category', e.target.value)}
@@ -59,11 +47,21 @@ export default function FilterPanel({ filters, onChange }) {
         </select>
       </div>
 
+      {/* Speciality */}
+      <div>
+        <label className="block text-xs font-medium text-gray-500 mb-1.5">Speciality</label>
+        <input
+          type="text"
+          value={filters.speciality || ''}
+          onChange={e => set('speciality', e.target.value)}
+          placeholder="e.g. Character Art, UI"
+          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+        />
+      </div>
+
       {/* Seniority */}
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1.5">
-          Seniority
-        </label>
+        <label className="block text-xs font-medium text-gray-500 mb-1.5">Seniority</label>
         <div className="flex flex-wrap gap-1.5">
           {SENIORITIES.map(({ value, label }) => (
             <button
@@ -79,19 +77,6 @@ export default function FilterPanel({ filters, onChange }) {
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Status */}
-      <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
-        <select
-          value={filters.status || ''}
-          onChange={e => set('status', e.target.value)}
-          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
-        >
-          <option value="">All statuses</option>
-          {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
       </div>
 
       {/* Country */}

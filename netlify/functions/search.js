@@ -73,6 +73,10 @@ function filterCriteria(filters = {}) {
     parts.push(`(Pick_List_5:equals:${filters.category})`);
   }
 
+  if (filters.speciality && !skipCzpFields) {
+    parts.push(`(Specialities_2:contains:${filters.speciality})`);
+  }
+
   if (filters.seniority && !skipCzpFields) {
     // Zoho stores raw values like "middle", "student/trainee" — build OR for all variants
     const rawValues = SENIORITY_ZOHO_RAW[filters.seniority] || [filters.seniority];
