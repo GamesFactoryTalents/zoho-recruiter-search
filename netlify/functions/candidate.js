@@ -101,6 +101,7 @@ export const handler = async (event) => {
       gameTitles:       c.Game_Titles_or_Apps || '',
       tasks:            c.Tasks || '',
       achievements:     c.Achievements || '',
+      dreamJob:         c.What_are_the_challenges_and_lessons_learned || '',
       createdAt:        c.Created_Time || '',
       resumeId:         resume?.id || null,
       resumeName:       resume?.File_Name || null,

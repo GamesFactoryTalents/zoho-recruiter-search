@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { X, ExternalLink, MapPin, Briefcase, Clock, DollarSign, Plane, Loader2 } from 'lucide-react'
-import { fetchCandidate } from '../lib/api'
+import { X, ExternalLink, MapPin, Briefcase, Clock, DollarSign, Plane, Loader2, Sparkles } from 'lucide-react'
+import { fetchCandidate, summarizeCandidate } from '../lib/api'
 
 const SENIORITY_LABELS = {
   trainee:  'Trainee / Student',
@@ -37,19 +37,38 @@ function Section({ title, children }) {
 }
 
 export default function CandidateDrawer({ candidate: ref, onClose }) {
-  const [candidate, setCandidate] = useState(null)
-  const [loading, setLoading]     = useState(true)
-  const [error, setError]         = useState(null)
+  const [candidate, setCandidate]   = useState(null)
+  const [loading, setLoading]       = useState(true)
+  const [error, setError]           = useState(null)
+  const [summary, setSummary]       = useState(null)
+  const [sumLoading, setSumLoading] = useState(false)
+  const [sumError, setSumError]     = useState(null)
 
   useEffect(() => {
     if (!ref) return
     setLoading(true)
     setError(null)
+    setSummary(null)
+    setSumError(null)
     fetchCandidate(ref.id)
       .then(setCandidate)
       .catch(e => setError(e.message))
       .finally(() => setLoading(false))
   }, [ref?.id])
+
+  const handleSummarize = async () => {
+    if (!candidate) return
+    setSumLoading(true)
+    setSumError(null)
+    try {
+      const result = await summarizeCandidate(candidate)
+      setSummary(result)
+    } catch (e) {
+      setSumError(e.message)
+    } finally {
+      setSumLoading(false)
+    }
+  }
 
   const c = candidate || ref
 
@@ -149,6 +168,50 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
                   </a>
                 )}
               </Section>
+
+              {/* AI Summary */}
+              <div className="mb-5">
+                {!summary && !sumLoading && (
+                  <button
+                    onClick={handleSummarize}
+                    disabled={loading}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl border border-brand-200 bg-brand-50 text-brand-700 text-sm hover:bg-brand-100 transition-colors disabled:opacity-40"
+                  >
+                    <Sparkles size={14} /> Generate AI summary
+                  </button>
+                )}
+                {sumLoading && (
+                  <div className="flex items-center gap-2 text-sm text-brand-600 py-2">
+                    <Loader2 size={14} className="animate-spin" /> Generating summary…
+                  </div>
+                )}
+                {sumError && <p className="text-xs text-red-500 mt-1">{sumError}</p>}
+                {summary && (
+                  <div className="rounded-xl border border-brand-100 bg-brand-50 p-4 space-y-3">
+                    {summary.headline && (
+                      <p className="text-sm font-semibold text-brand-800">{summary.headline}</p>
+                    )}
+                    {summary.summary && (
+                      <p className="text-sm text-gray-700 leading-relaxed">{summary.summary}</p>
+                    )}
+                    {summary.strengths?.length > 0 && (
+                      <ul className="space-y-1">
+                        {summary.strengths.map((s, i) => (
+                          <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
+                            <span className="text-brand-400 mt-0.5">✦</span> {s}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <button
+                      onClick={() => setSummary(null)}
+                      className="text-xs text-gray-400 hover:text-gray-600"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Specialities */}
               {c.specialities?.length > 0 && (

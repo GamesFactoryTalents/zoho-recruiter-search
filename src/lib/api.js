@@ -15,3 +15,13 @@ export async function fetchCandidate(id) {
   if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
   return resp.json();
 }
+
+export async function summarizeCandidate(candidate) {
+  const resp = await fetch(`${BASE}/summarize`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(candidate),
+  });
+  if (!resp.ok) throw new Error(`Summarize failed: ${resp.status}`);
+  return resp.json();
+}
