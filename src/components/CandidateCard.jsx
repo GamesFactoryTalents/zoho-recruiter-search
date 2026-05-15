@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MapPin, Briefcase, Clock, ClipboardList, ChevronDown, ChevronUp, FileSearch } from 'lucide-react'
+import { MapPin, Briefcase, Clock, ClipboardList, ChevronDown, ChevronUp, FileSearch, Github, Globe } from 'lucide-react'
 
 const STATUS_COLORS = {
   'Applied-to-event':          'bg-blue-50 text-blue-700 border-blue-200',
@@ -66,6 +66,30 @@ export default function CandidateCard({ candidate, onClick }) {
               <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 uppercase tracking-wide">
                 <ClipboardList size={9} /> Interviewed
               </span>
+            )}
+            {candidate.github && (
+              <a
+                href={candidate.github}
+                target="_blank"
+                rel="noreferrer"
+                onClick={e => e.stopPropagation()}
+                title="GitHub"
+                className="shrink-0 text-gray-400 hover:text-gray-700 transition-colors"
+              >
+                <Github size={13} />
+              </a>
+            )}
+            {candidate.portfolio && (
+              <a
+                href={candidate.portfolio}
+                target="_blank"
+                rel="noreferrer"
+                onClick={e => e.stopPropagation()}
+                title="Portfolio"
+                className="shrink-0 text-gray-400 hover:text-brand-600 transition-colors"
+              >
+                <Globe size={13} />
+              </a>
             )}
           </div>
           {jobTitle && (

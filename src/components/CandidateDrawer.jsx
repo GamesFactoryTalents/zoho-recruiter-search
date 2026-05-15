@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, ExternalLink, MapPin, Briefcase, Clock, DollarSign, Plane, Loader2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, ExternalLink, MapPin, Briefcase, Clock, DollarSign, Plane, Loader2, Sparkles, ChevronDown, ChevronUp, Github, Globe } from 'lucide-react'
 import { fetchCandidate, summarizeCandidate } from '../lib/api'
 
 const SENIORITY_LABELS = {
@@ -159,15 +159,27 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
                   )}
                 </div>
 
-                {c.linkedin && (
-                  <a
-                    href={c.linkedin}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-sm text-brand-600 hover:underline mt-2"
-                  >
-                    <ExternalLink size={13} /> LinkedIn Profile
-                  </a>
+                {(c.linkedin || c.github || c.portfolio) && (
+                  <div className="flex flex-wrap gap-3 mt-2">
+                    {c.linkedin && (
+                      <a href={c.linkedin} target="_blank" rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm text-brand-600 hover:underline">
+                        <ExternalLink size={13} /> LinkedIn
+                      </a>
+                    )}
+                    {c.github && (
+                      <a href={c.github} target="_blank" rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 hover:underline">
+                        <Github size={13} /> GitHub
+                      </a>
+                    )}
+                    {c.portfolio && (
+                      <a href={c.portfolio} target="_blank" rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm text-brand-600 hover:underline">
+                        <Globe size={13} /> Portfolio
+                      </a>
+                    )}
+                  </div>
                 )}
               </Section>
 

@@ -21,6 +21,11 @@ const CANDIDATE_FIELDS = [
   'Work_Preferences',
   'Relocation',
   'LinkedIn',
+  'GitHub',
+  'Github',
+  'Portfolio',
+  'Portfolio_URL',
+  'Website',
   'Created_Time',
 ].join(',');
 
@@ -237,6 +242,8 @@ function formatCandidate(c) {
     expectedSalary: c.Expected_Salary,
     relocation:     c.Relocation,
     linkedin:        c.LinkedIn || c.LinkedIn__s || '',
+    github:          c.GitHub || c.Github || c.GitHub_URL || c.Github_URL || '',
+    portfolio:       c.Portfolio || c.Portfolio_URL || c.Website || c.Portfolio_Link || '',
     screeningNotes:  c.Screening_notes || '',
     createdAt:       c.Created_Time || '',
   };

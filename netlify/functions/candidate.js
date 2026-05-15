@@ -74,6 +74,11 @@ export const handler = async (event) => {
       return (typeof cat === 'object' ? cat?.name : cat) === 'Resume';
     });
 
+    // Temporary: log all field names to identify GitHub/portfolio field names in Zoho
+    console.log('[candidate fields]', Object.keys(c).filter(k =>
+      /github|portfolio|website|url|link|single_line/i.test(k)
+    ));
+
     const candidate = {
       id:               c.id,
       name:             c.Full_Name || `${c.First_Name || ''} ${c.Last_Name || ''}`.trim(),
@@ -96,6 +101,8 @@ export const handler = async (event) => {
       relocation:       c.Relocation,
       workPreferences:  pickList(c.Work_Preferences),
       linkedin:         c.LinkedIn || c.LinkedIn__s || '',
+      github:           c.GitHub || c.Github || c.GitHub_URL || c.Github_URL || c.GitHub_Profile || '',
+      portfolio:        c.Portfolio || c.Portfolio_URL || c.Website || c.Personal_Website || c.Portfolio_Link || '',
       motivation:       c.Motivation || '',
       expectations:     c.Expectations_and_Dream_Job || '',
       gameTitles:       c.Game_Titles_or_Apps || '',
