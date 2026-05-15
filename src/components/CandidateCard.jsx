@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MapPin, Briefcase, Clock, ClipboardList, ChevronDown, ChevronUp } from 'lucide-react'
+import { MapPin, Briefcase, Clock, ClipboardList, ChevronDown, ChevronUp, FileSearch } from 'lucide-react'
 
 const STATUS_COLORS = {
   'Applied-to-event':          'bg-blue-50 text-blue-700 border-blue-200',
@@ -159,6 +159,19 @@ export default function CandidateCard({ candidate, onClick }) {
               {p}
             </span>
           ))}
+        </div>
+      )}
+
+      {/* CV excerpt — shown in CV search mode */}
+      {candidate.cvExcerpt && (
+        <div className="mt-3 border-t border-amber-100 pt-2.5">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-amber-700 mb-1.5">
+            <FileSearch size={11} />
+            CV match
+          </div>
+          <p className="text-xs text-gray-600 leading-relaxed italic bg-amber-50 rounded-lg px-3 py-2 border border-amber-100">
+            {candidate.cvExcerpt}
+          </p>
         </div>
       )}
 

@@ -1,12 +1,13 @@
-import { Search, Sparkles, Code2, Type } from 'lucide-react'
+import { Search, Sparkles, Code2, Type, ClipboardList, FileSearch } from 'lucide-react'
 
 const MODES = [
-  { id: 'simple',  label: 'Simple',  icon: Type,     tip: 'Search by keyword across name, skills and title' },
-  { id: 'boolean', label: 'Boolean', icon: Code2,    tip: 'Use AND / OR / NOT  e.g.  unity AND mobile NOT junior' },
-  { id: 'ai',      label: 'AI',      icon: Sparkles, tip: 'Natural language  e.g.  senior Unity dev in Finland open to relocation' },
+  { id: 'simple',  label: 'Simple',  icon: Type,       tip: 'Search by keyword across name, skills and title' },
+  { id: 'boolean', label: 'Boolean', icon: Code2,      tip: 'Use AND / OR / NOT  e.g.  unity AND mobile NOT junior' },
+  { id: 'ai',      label: 'AI',      icon: Sparkles,   tip: 'Natural language  e.g.  senior Unity dev in Finland open to relocation' },
+  { id: 'cv',      label: 'CV',      icon: FileSearch, tip: 'Search inside candidate CVs  e.g.  shipped a mobile game as lead programmer' },
 ]
 
-export default function SearchBar({ query, mode, onQueryChange, onModeChange, onSearch, loading }) {
+export default function SearchBar({ query, mode, onQueryChange, onModeChange, onSearch, loading, interviewed, onInterviewedChange }) {
   const currentMode = MODES.find(m => m.id === mode)
 
   const handleKey = (e) => {
@@ -15,23 +16,46 @@ export default function SearchBar({ query, mode, onQueryChange, onModeChange, on
 
   return (
     <div className="space-y-3">
-      {/* Mode tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
-        {MODES.map(m => (
-          <button
-            key={m.id}
-            onClick={() => onModeChange(m.id)}
-            title={m.tip}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-              mode === m.id
-                ? 'bg-white text-brand-600 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <m.icon size={14} />
-            {m.label}
-          </button>
-        ))}
+      {/* Mode tabs + Interviewed toggle */}
+      <div className="flex items-center gap-3">
+        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+          {MODES.map(m => {
+            const isActive = mode === m.id
+            const isCv = m.id === 'cv'
+            return (
+              <button
+                key={m.id}
+                onClick={() => onModeChange(m.id)}
+                title={m.tip}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  isActive && isCv
+                    ? 'bg-amber-500 text-white shadow-sm'
+                    : isActive
+                    ? 'bg-white text-brand-600 shadow-sm'
+                    : isCv
+                    ? 'text-amber-600 hover:text-amber-700'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <m.icon size={14} />
+                {m.label}
+              </button>
+            )
+          })}
+        </div>
+
+        <button
+          onClick={() => onInterviewedChange(!interviewed)}
+          title="Show only candidates we have interviewed"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${
+            interviewed
+              ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
+              : 'bg-white text-gray-500 border-gray-200 hover:border-emerald-300 hover:text-emerald-700'
+          }`}
+        >
+          <ClipboardList size={14} />
+          Interviewed
+        </button>
       </div>
 
       {/* Search input */}

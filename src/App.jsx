@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { Users, AlertCircle, ChevronDown, Sparkles } from 'lucide-react'
+import { Users, AlertCircle, ChevronDown, Sparkles, FileSearch } from 'lucide-react'
 import SearchBar      from './components/SearchBar'
 import FilterPanel    from './components/FilterPanel'
 import CandidateCard  from './components/CandidateCard'
@@ -7,17 +7,34 @@ import CandidateDrawer from './components/CandidateDrawer'
 import { searchCandidates } from './lib/api'
 
 export default function App() {
-  const [query,     setQuery]     = useState('')
-  const [mode,      setMode]      = useState('simple')
-  const [filters,   setFilters]   = useState({})
-  const [results,   setResults]   = useState(null)   // null = not searched yet
-  const [loading,   setLoading]   = useState(false)
-  const [error,     setError]     = useState(null)
-  const [page,      setPage]      = useState(1)
-  const [hasMore,   setHasMore]   = useState(false)
-  const [aiNote,    setAiNote]    = useState(null)
-  const [selected,  setSelected]  = useState(null)
+  const [query,       setQuery]       = useState('')
+  const [mode,        setMode]        = useState('simple')
+  const [filters,     setFilters]     = useState({})
+  const [interviewed, setInterviewed] = useState(false)
+  const [results,     setResults]     = useState(null)   // null = not searched yet
+  const [loading,     setLoading]     = useState(false)
+  const [error,       setError]       = useState(null)
+  const [page,        setPage]        = useState(1)
+  const [hasMore,     setHasMore]     = useState(false)
+  const [aiNote,      setAiNote]      = useState(null)
+  const [selected,    setSelected]    = useState(null)
   const [loadingMore, setLoadingMore] = useState(false)
+
+  // Generate a realistic-looking mock CV excerpt for UI preview
+  const mockCvExcerpt = (candidate) => {
+    const skills   = candidate.skills?.length  ? candidate.skills  : candidate.skillSet || []
+    const yrs      = candidate.experienceYears
+    const cat      = candidate.category || 'game development'
+    const picked   = skills.slice(0, 3).join(', ') || cat
+
+    const snippets = [
+      `…proficient in ${picked}, delivered multiple shipped titles across ${yrs || 3}+ years. Led cross-functional teams and drove technical decisions from pre-production through release…`,
+      `…${yrs || 2} years of hands-on experience with ${picked}. Collaborated with designers and artists to implement gameplay systems, achieving a 40% reduction in iteration time…`,
+      `…core responsibilities included ${picked} development, code review, and mentoring junior developers. Shipped 3 titles on PC and console platforms…`,
+      `…strong background in ${picked}. Worked in agile teams of 8–15 people, contributing to all stages of the development pipeline from prototype to certification…`,
+    ]
+    return snippets[Math.floor(candidate.id?.charCodeAt(candidate.id.length - 1) || 0) % snippets.length]
+  }
 
   const doSearch = useCallback(async (reset = true) => {
     const p = reset ? 1 : page + 1
@@ -26,11 +43,18 @@ export default function App() {
     setError(null)
 
     try {
-      const data = await searchCandidates({ query, mode, filters, page: p })
+      // CV mode: run as AI search under the hood, then inject mock CV excerpts
+      const searchMode = mode === 'cv' ? 'ai' : mode
+      const data = await searchCandidates({ query, mode: searchMode, filters: { ...filters, ...(interviewed ? { interviewed: true } : {}) }, page: p })
+
+      const candidates = mode === 'cv' && query.trim()
+        ? data.candidates.map(c => ({ ...c, cvExcerpt: mockCvExcerpt(c) }))
+        : data.candidates
+
       if (reset) {
-        setResults(data.candidates)
+        setResults(candidates)
       } else {
-        setResults(prev => [...(prev || []), ...data.candidates])
+        setResults(prev => [...(prev || []), ...candidates])
       }
       setHasMore(data.more)
       setPage(p)
@@ -41,7 +65,7 @@ export default function App() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [query, mode, filters, page])
+  }, [query, mode, filters, interviewed, page])
 
   const handleSearch = () => doSearch(true)
   const handleLoadMore = () => doSearch(false)
@@ -49,7 +73,7 @@ export default function App() {
   // Auto-load all candidates on mount
   useEffect(() => { doSearch(true) }, [])
 
-  const activeFilterCount = Object.values(filters).filter(Boolean).length
+  const activeFilterCount = Object.values(filters).filter(Boolean).length + (interviewed ? 1 : 0)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -85,6 +109,8 @@ export default function App() {
               onModeChange={setMode}
               onSearch={handleSearch}
               loading={loading}
+              interviewed={interviewed}
+              onInterviewedChange={setInterviewed}
             />
 
             {/* Mobile filters */}
@@ -92,8 +118,19 @@ export default function App() {
               <FilterPanel filters={filters} onChange={setFilters} />
             </div>
 
+            {/* CV mode banner */}
+            {mode === 'cv' && (
+              <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+                <FileSearch size={16} className="mt-0.5 shrink-0 text-amber-500" />
+                <div>
+                  <span className="font-semibold">CV Search — preview mode</span>
+                  <span className="text-amber-700"> · Candidates are matched by profile. CV excerpts below are illustrative — full CV indexing not yet enabled.</span>
+                </div>
+              </div>
+            )}
+
             {/* AI explanation */}
-            {aiNote && (
+            {aiNote && mode !== 'cv' && (
               <div className="flex items-start gap-2 bg-brand-50 border border-brand-100 rounded-xl px-4 py-3 text-sm text-brand-700">
                 <Sparkles size={15} className="mt-0.5 shrink-0" />
                 <span>{aiNote}</span>

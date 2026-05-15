@@ -26,25 +26,17 @@ const STATUSES = [
   'Placed',
 ]
 
-function CzpBadge() {
-  return (
-    <span className="ml-1.5 text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-50 text-blue-500 uppercase tracking-wide">
-      CZP
-    </span>
-  )
-}
 
 export default function FilterPanel({ filters, onChange }) {
   const set = (key, val) => onChange({ ...filters, [key]: val || undefined })
   const clear = () => onChange({})
 
   const activeCount = Object.values(filters).filter(Boolean).length
-  const czpMode = filters.source === 'czp'
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-gray-700">Filters</span>
+        <span className="text-sm font-semibold text-gray-700">Careers Zone Filters</span>
         {activeCount > 0 && (
           <button onClick={clear} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600">
             <X size={12} /> Clear all ({activeCount})
@@ -52,52 +44,10 @@ export default function FilterPanel({ filters, onChange }) {
         )}
       </div>
 
-      {/* Interviewed quick filter */}
-      <button
-        onClick={() => set('interviewed', filters.interviewed ? '' : 'true')}
-        className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-          filters.interviewed
-            ? 'bg-emerald-500 border-emerald-500 text-white'
-            : 'bg-white border-gray-200 text-gray-600 hover:border-emerald-300 hover:text-emerald-700'
-        }`}
-      >
-        <span className={`w-2 h-2 rounded-full ${filters.interviewed ? 'bg-white' : 'bg-emerald-400'}`} />
-        Interviewed candidates
-      </button>
-
-      {/* Source toggle */}
-      <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1.5">Candidate source</label>
-        <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs font-medium">
-          {[
-            { value: '',    label: 'All' },
-            { value: 'czp', label: 'Careers Zone' },
-            { value: 'job', label: 'Job Board' },
-          ].map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => set('source', opt.value)}
-              className={`flex-1 py-1.5 transition-colors ${
-                (filters.source || '') === opt.value
-                  ? 'bg-brand-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        {!czpMode && (filters.category || filters.seniority) && (
-          <p className="text-[11px] text-amber-600 mt-1.5 leading-snug">
-            Category &amp; Seniority filters only match Careers Zone candidates — job board applicants don't have these fields.
-          </p>
-        )}
-      </div>
-
-      {/* Category — CZP field */}
+      {/* Category */}
       <div>
         <label className="block text-xs font-medium text-gray-500 mb-1.5">
-          Category <CzpBadge />
+          Category
         </label>
         <select
           value={filters.category || ''}
@@ -109,10 +59,10 @@ export default function FilterPanel({ filters, onChange }) {
         </select>
       </div>
 
-      {/* Seniority — CZP field */}
+      {/* Seniority */}
       <div>
         <label className="block text-xs font-medium text-gray-500 mb-1.5">
-          Seniority <CzpBadge />
+          Seniority
         </label>
         <div className="flex flex-wrap gap-1.5">
           {SENIORITIES.map(({ value, label }) => (
