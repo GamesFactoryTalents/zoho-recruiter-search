@@ -231,9 +231,16 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
                 </Section>
               )}
 
-              {/* Skill Set (from CV / LinkedIn import) */}
-              {c.skillSet?.length > 0 && (
-                <Section title="Skill Set (CV)">
+              {/* Skill Set — from CV/LinkedIn import, shown for all candidates */}
+              {c.skillSet?.length > 0 && !c.skills?.length && (
+                <Section title="Skills (from CV)">
+                  <div className="flex flex-wrap gap-1.5">
+                    {c.skillSet.map(s => <Tag key={s} color="gray">{s}</Tag>)}
+                  </div>
+                </Section>
+              )}
+              {c.skillSet?.length > 0 && c.skills?.length > 0 && (
+                <Section title="Additional Skills (CV)">
                   <div className="flex flex-wrap gap-1.5">
                     {c.skillSet.map(s => <Tag key={s} color="gray">{s}</Tag>)}
                   </div>
