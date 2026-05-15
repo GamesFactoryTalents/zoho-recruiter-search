@@ -68,20 +68,21 @@ function buildSimpleCriteria(query, filters) {
 function buildBooleanCriteria(query, filters) {
   if (!query || !query.trim()) return buildSimpleCriteria('', filters);
 
-  // Tokenise: split on AND / OR / NOT (word boundaries, case-insensitive)
-  const raw = query.trim();
-  const tokens = raw.split(/\s+(AND|OR|NOT)\s+/i);
-  const ops    = [...raw.matchAll(/\s+(AND|OR|NOT)\s+/gi)].map(m => m[1].toUpperCase());
+  // Split gives alternating [term, op, term, op, term...] because of capturing group
+  const raw    = query.trim();
+  const parts  = raw.split(/\s+(AND|OR|NOT)\s+/i);
+  const terms  = parts.filter((_, i) => i % 2 === 0); // even indices = terms
+  const ops    = parts.filter((_, i) => i % 2 === 1); // odd indices = operators
 
   const termCriteria = (term) => {
     const t = term.replace(/[()]/g, '').trim();
     return `((SKILLS:contains:${t})OR(Specialities_2:contains:${t})OR(Full_Name:contains:${t}))`;
   };
 
-  let criteriaStr = termCriteria(tokens[0]);
-  for (let i = 1; i < tokens.length; i++) {
-    const op = ops[i - 1] === 'NOT' ? 'AND' : ops[i - 1];  // NOT handled post-fetch
-    criteriaStr += `${op}${termCriteria(tokens[i])}`;
+  let criteriaStr = termCriteria(terms[0]);
+  for (let i = 1; i < terms.length; i++) {
+    const op = ops[i - 1].toUpperCase() === 'NOT' ? 'AND' : ops[i - 1].toUpperCase();
+    criteriaStr += `${op}${termCriteria(terms[i])}`;
   }
 
   const filterParts = filterCriteria(filters);
@@ -124,8 +125,17 @@ Return JSON only — no markdown:
       }],
     }),
   });
+
+  if (!resp.ok) {
+    const err = await resp.text();
+    throw new Error(`Anthropic API error ${resp.status}: ${err}`);
+  }
+
   const data = await resp.json();
-  let raw = data.content[0].text.trim();
+  const text = data?.content?.[0]?.text;
+  if (!text) throw new Error('Empty Anthropic response: ' + JSON.stringify(data));
+
+  let raw = text.trim();
   if (raw.startsWith('```')) { raw = raw.split('```')[1]; if (raw.startsWith('json')) raw = raw.slice(4); raw = raw.trim(); }
   return JSON.parse(raw);
 }
