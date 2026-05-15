@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, ExternalLink, MapPin, Briefcase, Clock, DollarSign, Plane, Loader2, Sparkles } from 'lucide-react'
+import { X, ExternalLink, MapPin, Briefcase, Clock, DollarSign, Plane, Loader2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
 import { fetchCandidate, summarizeCandidate } from '../lib/api'
 
 const SENIORITY_LABELS = {
@@ -43,6 +43,7 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
   const [summary, setSummary]       = useState(null)
   const [sumLoading, setSumLoading] = useState(false)
   const [sumError, setSumError]     = useState(null)
+  const [notesOpen, setNotesOpen]   = useState(false)
 
   useEffect(() => {
     if (!ref) return
@@ -50,6 +51,7 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
     setError(null)
     setSummary(null)
     setSumError(null)
+    setNotesOpen(false)
     fetchCandidate(ref.id)
       .then(setCandidate)
       .catch(e => setError(e.message))
@@ -169,13 +171,25 @@ export default function CandidateDrawer({ candidate: ref, onClose }) {
                 )}
               </Section>
 
-              {/* Screening Notes — shown prominently when present */}
+              {/* Screening Notes — collapsible */}
               {c.screeningNotes && (
-                <Section title="🟢 Screening Notes (Interviewed)">
-                  <div className="bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                    {c.screeningNotes}
-                  </div>
-                </Section>
+                <div className="mb-5">
+                  <button
+                    onClick={() => setNotesOpen(v => !v)}
+                    className="flex items-center justify-between w-full px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-sm font-semibold text-emerald-800 hover:bg-emerald-100 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      Screening Notes · Interviewed
+                    </span>
+                    {notesOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                  </button>
+                  {notesOpen && (
+                    <div className="mt-2 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {c.screeningNotes}
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* AI Summary */}
