@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Users, AlertCircle, ChevronDown, Sparkles } from 'lucide-react'
 import SearchBar      from './components/SearchBar'
 import FilterPanel    from './components/FilterPanel'
@@ -45,6 +45,9 @@ export default function App() {
 
   const handleSearch = () => doSearch(true)
   const handleLoadMore = () => doSearch(false)
+
+  // Auto-load all candidates on mount
+  useEffect(() => { doSearch(true) }, [])
 
   const activeFilterCount = Object.values(filters).filter(Boolean).length
 
